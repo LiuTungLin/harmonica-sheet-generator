@@ -1,11 +1,12 @@
-import random
 from note_seq.protobuf.music_pb2 import NoteSequence
 from chords import all_chords
 from style_config import style_definitions
 from generate_chords import get_chord_progression
 
+ELECTRIC_BASS = 33
+REST_PREFIX = "#"
 
-def generate_bass(style_name, tempo=120, instrument=32, velocity=80):
+def generate_bass(style_name, tempo=120, instrument=ELECTRIC_BASS, velocity=80):
     """
     根據風格名稱與節奏，生成低音線。
 
@@ -32,10 +33,10 @@ def generate_bass(style_name, tempo=120, instrument=32, velocity=80):
     for chord in chords_list:
         # 取該和弦最低音為 bass root
         pitches = all_chords.get(chord, all_chords['C'])
-        root_pitch = pitches[0]
+        root_pitch = pitches[0]-12 # 下移8度
         for dur in rhythm_pattern:
             # 處理休止符
-            if isinstance(dur, str) and dur.startswith('#'):
+            if isinstance(dur, str) and dur.startswith(REST_PREFIX):
                 current_time += float(dur[1:]) * seconds_per_beat
                 continue
 

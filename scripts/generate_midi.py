@@ -1,12 +1,12 @@
 import os
 import warnings
 import datetime
+import argparse
 from note_seq import sequence_proto_to_midi_file
 from note_seq.protobuf import music_pb2
 from generate_melody import generate_melody
 from generate_bass import generate_bass
 from generate_chords import get_chord_progression, generate_chords
-from style_config import style_definitions
 
 # 關閉 TensorFlow INFO/WARNING
 warnings.filterwarnings('ignore')
@@ -44,4 +44,10 @@ def generate_midi(style_name="Pop", tempo=120):
 
 
 if __name__ == "__main__":
-    generate_midi(style_name="Pop", tempo=120)
+    parser = argparse.ArgumentParser(description="生成 MIDI 檔案")
+    parser.add_argument('--style', type=str, default="Pop", help='音樂風格，目前支援 Pop, Rock, Ballad, Folk, EDM, Lo-Fi')
+    parser.add_argument('--tempo', type=int, default=120, help='節奏 (BPM)')
+
+    args = parser.parse_args()
+
+    generate_midi(style_name=args.style, tempo=args.tempo)

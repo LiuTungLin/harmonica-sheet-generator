@@ -1,10 +1,10 @@
 import os
 import warnings
-import note_seq
 from note_seq.protobuf import generator_pb2
 from note_seq.protobuf.music_pb2 import NoteSequence
 from magenta.models.melody_rnn import melody_rnn_sequence_generator
 from magenta.models.shared import sequence_generator_bundle
+from generate_chords import get_chord_progression
 
 # 關閉 TensorFlow INFO/WARNING
 warnings.filterwarnings('ignore')
@@ -28,7 +28,6 @@ def generate_melody(style_name, tempo=120):
       NoteSequence
     """
     # 1. 從 generate_chords 模組取得和弦進行與節奏
-    from generate_chords import get_chord_progression
     chords_list, rhythm_pattern = get_chord_progression(style_name)
 
     # 2. chord_symbols 為每小節一個和弦 (Melody RNN 支援這種對應)

@@ -3,6 +3,9 @@ from note_seq.protobuf.music_pb2 import NoteSequence
 from chords import all_chords
 from style_config import style_definitions
 
+ACOUSTIC_GUITAR = 24
+REST_PREFIX = "#"
+
 def get_chord_progression(style_name):
     """
     根據風格名稱取得和弦進行與節奏。
@@ -35,7 +38,7 @@ def get_chord_progression(style_name):
     return chords_list, rhythm_pattern
 
 
-def generate_chords(chords_list, rhythm_pattern, tempo=120, instrument=1, velocity=80):
+def generate_chords(chords_list, rhythm_pattern, tempo=120, instrument=ACOUSTIC_GUITAR, velocity=50):
     """
     根據和弦清單與節奏生成 NoteSequence。
 
@@ -51,10 +54,15 @@ def generate_chords(chords_list, rhythm_pattern, tempo=120, instrument=1, veloci
     current_time = 0.0
 
     for chord in chords_list:
-        pitches = all_chords.get(chord, all_chords.get("C", []))
+        pitches = all_chords.get(chord)
+
+        if pitches is None:
+            print(f"警告: 和弦 {chord} 未定義，將使用 C 和弦代替。")
+            pitches = all_chords["C"]
+            
         for dur in rhythm_pattern:
             # 休止符
-            if isinstance(dur, str) and dur.startswith("#"):
+            if isinstance(dur, str) and dur.startswith(REST_PREFIX):
                 current_time += float(dur[1:]) * seconds_per_beat
                 continue
 
