@@ -38,7 +38,7 @@ def generate_midi(style_name="Pop", tempo=120):
 
     # 4. 存檔
     filename = f"harmonica_sheet_{datetime.datetime.now():%Y%m%d%H%M}.mid"
-    output_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'midi', filename)
+    output_path = os.path.join(os.path.dirname(__file__), '..', 'midis', filename)
     sequence_proto_to_midi_file(merged_seq, output_path)
     print(f"已生成 MIDI: {output_path}")
 
