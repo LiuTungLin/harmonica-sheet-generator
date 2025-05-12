@@ -45,7 +45,7 @@ def generate_midi(style_name="Pop", tempo=120):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="生成 MIDI 檔案")
-    parser.add_argument('--style', type=str, default="Pop", help='音樂風格，目前支援 Pop, Rock, Ballad, Folk, EDM, Lo-Fi')
+    parser.add_argument('--style', type=str, default="Folk", help='音樂風格，目前支援 Pop, Rock, Ballad, Folk, EDM, Lo-Fi')
     parser.add_argument('--tempo', type=int, default=120, help='節奏 (BPM)')
 
     args = parser.parse_args()
