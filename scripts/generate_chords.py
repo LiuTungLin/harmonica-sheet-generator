@@ -23,9 +23,11 @@ def get_chord_progression(style_name):
 
     # 組合和弦進行
     chords_list = []
-    for section_name, repeats in style["structure"]:
-        chords = style["chords"].get(section_name, [])
-        chords_list.extend(chords * repeats)
+    for section_name, bars in style["structure"]:
+        chord_seq = style["chords"].get(section_name, [])
+        for i in range(bars):
+            # 每小節使用 chord_seq 的第 i % len(chord_seq) 個和弦
+            chords_list.append(chord_seq[i % len(chord_seq)])
 
     # 選擇節奏樣板
     rhythms_dict = style.get("rhythms", {})
