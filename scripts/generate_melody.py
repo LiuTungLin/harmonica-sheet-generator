@@ -14,7 +14,7 @@ output_dir = project_root / 'midis'
 bundle_file_str = str(bundle_file)
 output_dir_str = str(output_dir)
 
-def generate_improv_midi(style_name='Folk'):
+def generate_improv_midi(style_name, tempo):
     # 取得對應風格的和弦進行
     chords_list, rhythm_pattern = get_chord_progression(style_name)
     chords_string = ' '.join(chords_list)
@@ -25,6 +25,7 @@ def generate_improv_midi(style_name='Folk'):
     primer_melody = '[55]'
     backing_chords = chords_string
     steps_per_chord = '16'
+    qpm = tempo
 
     # 建立命令列參數列表
     cmd = [
@@ -35,7 +36,8 @@ def generate_improv_midi(style_name='Folk'):
         f'--num_outputs={num_outputs}',
         f'--primer_melody={primer_melody}',
         f'--backing_chords={backing_chords}',
-        f'--steps_per_chord={steps_per_chord}'
+        f'--steps_per_chord={steps_per_chord}',
+        f'--qpm={tempo}'
     ]
 
     try:
@@ -47,9 +49,9 @@ def generate_improv_midi(style_name='Folk'):
         print(f"執行 improv_rnn_generate 時發生錯誤: {e}")
         return False
 
-def generate_melody(style_name, tempo=120):
+def generate_melody(style_name, tempo):
     # 先確保主旋律生成
-    if generate_improv_midi(style_name):
+    if generate_improv_midi(style_name, tempo):
         # 找到 output_dir 中最新的 MIDI 檔案
         midi_files = list(output_dir.glob('*.mid'))
         if not midi_files:
@@ -68,7 +70,7 @@ def generate_melody(style_name, tempo=120):
             print(f"已刪除主旋律 MIDI 檔案：{latest_midi.name}")
         except Exception as e:
             print(f"刪除主旋律 MIDI 檔案失敗：{e}")
-            
+
         return note_sequence
     
     else:
