@@ -22,34 +22,58 @@ def generate_bass(style_name, tempo=120, instrument=ELECTRIC_BASS, velocity=80):
     # 取得和弦進行與對應節奏列表
     chords_list, rhythms_per_chord = get_chord_progression(style_name)
 
+    # 根據段落結構，設定每小節模式：
+    # Intro/Outro 固定模式1 (全部根音)
+    # 其他段落交替模式2與模式3
+    structure = style_definitions[style_name]["structure"]
+    modes_per_chord = []
+    flip = True  # 用於在段落間交替模式2與3
+    for section_name, bars in structure:
+        if section_name in ["Intro", "Outro"]:
+            modes_per_chord.extend([1] * bars)
+        else:
+            mode = 2 if flip else 3
+            modes_per_chord.extend([mode] * bars)
+            flip = not flip
+
     # 建立 NoteSequence
     seq = NoteSequence()
     seq.tempos.add(qpm=tempo)
-
     seconds_per_beat = 60.0 / tempo
     current_time = 0.0
 
-    # 依對應節奏，為每個和弦播放低音根音
-    for chord, pattern in zip(chords_list, rhythms_per_chord):
-        # 取該和弦最低音為 bass root，並下移一個八度
+    # 每個小節依對應節奏與模式播放低音
+    for chord, pattern, mode in zip(chords_list, rhythms_per_chord, modes_per_chord):
+        # 取得和弦根、三度與五度
         pitches = all_chords.get(chord, all_chords.get('C', []))
-        root_pitch = pitches[0] - 12 if pitches else 36  # default to C2 if empty
+        if len(pitches) >= 3:
+            root, third, fifth = pitches[0], pitches[1], pitches[2]
+        else:
+            root, third, fifth = 48, 52, 55  # C chord fallback
+
+        # 根據模式設定輪替音高
+        if mode == 1:
+            cycle_pitches = [root]
+        elif mode == 2:
+            cycle_pitches = [root, third, fifth]
+        else:
+            cycle_pitches = [root + 12, fifth, third]
+
+        # 每小節內重置 step
+        step = 0
         for dur in pattern:
-            # 處理休止符
             if isinstance(dur, str) and dur.startswith(REST_PREFIX):
                 current_time += float(dur[1:]) * seconds_per_beat
-                continue
-
-            # 播放低音音符
-            dur_seconds = dur * seconds_per_beat
-            note = seq.notes.add()
-            note.pitch = root_pitch
-            note.start_time = current_time
-            note.end_time = current_time + dur_seconds
-            note.velocity = velocity
-            note.instrument = instrument
-
-            current_time += dur_seconds
+            else:
+                dur_seconds = dur * seconds_per_beat
+                note = seq.notes.add()
+                note.pitch = cycle_pitches[step % len(cycle_pitches)]
+                note.start_time = current_time
+                note.end_time = current_time + dur_seconds
+                note.velocity = velocity
+                note.instrument = instrument
+                current_time += dur_seconds
+                step += 1
 
     seq.total_time = current_time
     return seq
