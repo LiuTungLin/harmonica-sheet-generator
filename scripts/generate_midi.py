@@ -1,5 +1,4 @@
 import os
-import warnings
 import datetime
 import argparse
 from note_seq import sequence_proto_to_midi_file
@@ -7,10 +6,6 @@ from note_seq.protobuf import music_pb2
 from generate_melody import generate_melody
 from generate_bass import generate_bass
 from generate_chords import get_chord_progression, generate_chords
-
-# 關閉 TensorFlow INFO/WARNING
-warnings.filterwarnings('ignore')
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 def merge_sequences(sequences):
     merged = music_pb2.NoteSequence()
