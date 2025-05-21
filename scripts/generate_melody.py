@@ -22,7 +22,7 @@ def generate_improv_midi(style_name, tempo):
     # 定義各個參數
     config = 'chord_pitches_improv'
     num_outputs = '1'
-    primer_melody = '[55]'
+    primer_melody = '[60]'
     backing_chords = chords_string
     steps_per_chord = '16'
     qpm = tempo
