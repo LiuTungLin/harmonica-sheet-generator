@@ -47,7 +47,7 @@ def generate_bass(style_name, tempo=120, instrument=ELECTRIC_BASS, velocity=80):
         # 取得和弦根、三度與五度
         pitches = all_chords.get(chord, all_chords.get('C', []))
         if len(pitches) >= 3:
-            root, third, fifth = pitches[0], pitches[1], pitches[2]
+            root, third, fifth = pitches[0]-12, pitches[1]-12, pitches[2]-12
         else:
             root, third, fifth = 48, 52, 55  # C chord fallback
 
