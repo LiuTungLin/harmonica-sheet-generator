@@ -19,7 +19,7 @@
   - 在開頭與結尾兩個段落皆使用和弦的根音。
   - 中間段落則採用和弦的上行琶音與下行琶音交錯使用。
 
-## 風格、和弦進行、節奏樣式
+### 風格、和弦進行、節奏樣式
 - 本系統參考了 [All Era Music](https://alleramusic.com/) 中的 [Music Rhythms](https://alleramusic.com/rhythms) 與 [Chords Progressions](https://alleramusic.com/progressions)。
 - 各風格的和弦進行與節奏樣式定義在 style_config.py 中。
 
