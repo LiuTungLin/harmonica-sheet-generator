@@ -66,4 +66,13 @@
     ```
     python ui.py
     ```
+    2.4 使用網頁  
+
+    ```
+    python app.py
+    ```
+    開啟瀏覽器輸入網址
+    ```
+    http://localhost:5000/
+    ```
 3. 輸出的 MIDI 檔案會保存於 midis 資料夾中
