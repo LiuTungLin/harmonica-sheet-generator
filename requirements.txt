@@ -1,3 +1,4 @@
 midiutil == 1.2.1
 magenta == 2.1.4
 note-seq == 0.0.5
+flask == 3.0.3
