@@ -1,3 +1,4 @@
+# scripts/app.py
 from flask import Flask, render_template_string, request, send_from_directory
 import os
 import datetime
@@ -15,22 +16,40 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 MIDIS_DIR = os.path.join(BASE_DIR, 'midis')
 os.makedirs(MIDIS_DIR, exist_ok=True)
 
-# HTML 模板（使用 Bootstrap）
-TEMPLATE = '''
+# Bootstrap CSS & JS
+BOOTSTRAP_CSS = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+BOOTSTRAP_JS = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+
+# 導覽列 HTML
+NAVBAR = '''
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">MIDI 產生器</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link{% if active=='home' %} active{% endif %}" href="/">主頁</a></li>
+        <li class="nav-item"><a class="nav-link{% if active=='about' %} active{% endif %}" href="/about">關於</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+'''
+
+# 主頁完整模板
+HOME_PAGE = '''
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MIDI 產生器</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>主頁 - MIDI 產生器</title>
+  <link href="''' + BOOTSTRAP_CSS + '''" rel="stylesheet">
 </head>
 <body class="bg-light">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/">MIDI 產生器</a>
-    </div>
-  </nav>
+  ''' + NAVBAR + '''
   <div class="container py-4">
     <div class="row">
       <div class="col-md-8">
@@ -40,11 +59,11 @@ TEMPLATE = '''
       <div class="col-md-4">
         <form method="post" action="/generate">
           <div class="mb-3">
-            <label class="form-label">自訂風格描述</label>
-            <input type="text" class="form-control" name="user_desc" placeholder="輸入風格，如：藍調爵士">
+            <label class="form-label">請輸入風格描述(或從下方風格列表選擇)</label>
+            <input type="text" class="form-control" name="user_desc" placeholder="輸入風格描述，例：民謠">
           </div>
           <div class="mb-3">
-            <label class="form-label">或選擇預設風格</label>
+            <label class="form-label">風格列表</label>
             <select class="form-select" name="style">
               {% for s in styles %}
                 <option value="{{ s }}" {% if s==selected_style %}selected{% endif %}>{{ s }}</option>
@@ -66,6 +85,33 @@ TEMPLATE = '''
       </div>
     </div>
   </div>
+  <script src="''' + BOOTSTRAP_JS + '''"></script>
+</body>
+</html>
+'''
+
+# 關於頁模板
+ABOUT_PAGE = '''
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>關於 - MIDI 產生器</title>
+  <link href="''' + BOOTSTRAP_CSS + '''" rel="stylesheet">
+</head>
+<body class="bg-light">
+  ''' + NAVBAR + '''
+  <div class="container py-4">
+    <h2>關於 MIDI 產生器</h2>
+    <p>專案連結：</p>
+    <ul>
+      <li>
+        <a href="https://github.com/LiuTungLin/harmonica-sheet-generator">GitHub</a>
+      </li>
+    </ul>
+  </div>
+  <script src="''' + BOOTSTRAP_JS + '''"></script>
 </body>
 </html>
 '''
@@ -80,11 +126,12 @@ PREDEFINED_STYLES = [
 @app.route('/', methods=['GET'])
 def index():
     return render_template_string(
-        TEMPLATE,
+        HOME_PAGE,
         styles=PREDEFINED_STYLES,
         selected_style="Folk",
         tempo=120,
-        filename=None
+        filename=None,
+        active='home'
     )
 
 @app.route('/generate', methods=['POST'])
@@ -120,19 +167,23 @@ def generate():
     sequence_proto_to_midi_file(merged, out_path)
 
     return render_template_string(
-        TEMPLATE,
+        HOME_PAGE,
         styles=PREDEFINED_STYLES,
         selected_style=style,
         tempo=tempo,
         filename=filename,
         mapped=mapped,
-        score=score
+        score=score,
+        active='home'
     )
+
+@app.route('/about', methods=['GET'])
+def about():
+    return render_template_string(ABOUT_PAGE, active='about')
 
 @app.route('/midis/<path:filename>')
 def download_midi(filename):
     return send_from_directory(MIDIS_DIR, filename, as_attachment=True)
 
 if __name__ == '__main__':
-
     app.run(debug=True, host='0.0.0.0', port=5000)
