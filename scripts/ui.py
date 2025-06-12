@@ -7,6 +7,7 @@ from note_seq.protobuf import music_pb2
 from generate_melody import generate_melody
 from generate_bass import generate_bass
 from generate_chords import get_chord_progression, generate_chords
+from style_mapper import map_style
 
 def merge_sequences(sequences):
     merged = music_pb2.NoteSequence()
@@ -32,18 +33,37 @@ def generate_midi(style_name="Pop", tempo=120):
     status_label.config(text=f"已生成：{filename}")
 
 def on_generate():
-    style = style_var.get()
-    tempo = int(tempo_var.get())
+    # 讀取使用者風格輸入
+    user_desc = free_style_var.get().strip()
+    if user_desc:
+        # 映射到已定義風格
+        style, score = map_style(user_desc)
+        status_label.config(text=f"映射風格：{style} (相似度：{score:.2f})，生成中...")
+    else:
+        style = style_var.get()
+        status_label.config(text="生成中...")
+    try:
+        tempo = int(tempo_var.get())
+    except ValueError:
+        status_label.config(text="節奏需為整數！")
+        return
+
     generate_midi(style_name=style, tempo=tempo)
 
 # 建立 GUI 視窗
 window = tk.Tk()
 window.title("MIDI 產生器")
-window.geometry("320x200")
+window.geometry("400x260")
 
-# 音樂風格選單
+# 風格描述輸入
+free_style_var = tk.StringVar()
+ttk.Label(window, text="風格描述(若留空則以下方列表為主)").pack(pady=5)
+free_style_entry = ttk.Entry(window, textvariable=free_style_var)
+free_style_entry.pack(fill='x', padx=20)
+
+# 預設風格選單
 style_var = tk.StringVar(value="Folk")
-ttk.Label(window, text="選擇風格").pack(pady=5)
+ttk.Label(window, text="從風格列表中選擇").pack(pady=5)
 style_menu = ttk.Combobox(window, textvariable=style_var, values=[
     "Modern", "Ashanti", "Ewe", "Funk", "Ballad", 
     "Reggae", "Rock", "Disco", "Pop", "Blues", 
